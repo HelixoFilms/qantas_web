@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qantas PTFS - About Us</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Roboto', sans-serif; background:#f5f5f5; color:#1C1C1C; overflow-x:hidden; }
+
+/* Hero Section */
+.hero {
+    background: url('aboutus.png') center/cover no-repeat;
+    height:60vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; color:white; position:relative;
+}
+.hero::after { content:""; position:absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:0; }
+.hero-content { position:relative; z-index:1; animation: fadeIn 2s ease-in; }
+.hero h1 { font-family:'Montserrat', sans-serif; font-size:3em; margin-bottom:20px; }
+.hero p { font-size:1.2em; max-width:700px; margin:auto; }
+
+/* Sidebar */
+#sidebar { position: fixed; left:-250px; top:0; width:250px; height:100%; background:#E4002B; color:white; transition:left 0.3s; padding:20px; z-index:999; }
+#sidebar.open { left:0; }
+#sidebar a { display:block; margin:15px 0; color:white; text-decoration:none; font-weight:bold; }
+#sidebar-toggle { position:fixed; left:20px; top:20px; font-size:30px; cursor:pointer; z-index:1001; }
+
+/* Sections */
+section { padding:80px 20px; text-align:center; opacity:0; transform:translateY(30px); transition: all 1s ease-in-out; }
+section.visible { opacity:1; transform:translateY(0); }
+section h2 { font-family:'Montserrat', sans-serif; font-size:2.5em; margin-bottom:40px; color:#E4002B; }
+.pagesections { background-color: rgb(221, 221, 221); margin-left:20px; margin-right:20px; border:3px solid #E4002B; border-radius:15px; }
+
+/* Footer */
+footer { background:#1C1C1C; color:white; padding:40px 20px; text-align:center; }
+
+/* Animations */
+@keyframes fadeIn { 0% { opacity:0; transform:translateY(30px);} 100% { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div id="sidebar">
+    <a href="index.html">Home</a>
+    <a href="#about-us">About Us</a>
+    <a href="applications.html">Applications</a>
+    <a href="flights.html">Flights</a>
+    <a href="#footer">Contact</a>
+</div>
+<div id="sidebar-toggle">&#9776;</div>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>About Qantas PTFS</h1>
+        <p>Discover our mission, vision, and the passionate community behind Qantas PTFS, your premier virtual airline experience.</p>
+    </div>
+</section>
+
+<!-- About Us Section -->
+<section class="pagesections" id="about-us">
+    <h2>Our Story</h2>
+    <p>Qantas PTFS was founded to provide pilots and crew with an immersive, professional, and fun flying experience. We focus on realistic operations, engaging community events, and creating a welcoming environment for all skill levels. Our team is passionate about aviation and aims to bring the heart of Australia to the skies of PTFS.</p>
+    <br>
+    <h2>Mission</h2>
+    <p>To deliver the most engaging, realistic, and community-driven virtual airline experience, inspiring pilots and crew to grow together and enjoy every flight.</p>
+    <br>
+    <h2>Vision</h2>
+    <p>To become the leading virtual airline in PTFS, known for our professionalism, community, and memorable flying adventures.</p>
+    <br>
+    <h2>Community</h2>
+    <p>Our community is the backbone of Qantas PTFS. We encourage collaboration, skill-building, and friendship through group flights, events, and a friendly Discord server.</p>
+</section>
+
+<!-- Footer -->
+<footer id="footer">
+    <p>&copy; 2025 Qantas PTFS. All rights reserved.</p>
+</footer>
+
+<script>
+// Sidebar Toggle
+const sidebar = document.getElementById('sidebar');
+const toggle = document.getElementById('sidebar-toggle');
+toggle.addEventListener('click', () => { sidebar.classList.toggle('open'); });
+
+// Scroll Fade-in Animation
+const sections = document.querySelectorAll('section');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => { if(entry.isIntersecting){ entry.target.classList.add('visible'); } });
+}, { threshold: 0.2 });
+sections.forEach(section => observer.observe(section));
+</script>
+</body>
+</html>
