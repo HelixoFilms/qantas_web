@@ -4,93 +4,214 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Qantas PTFS - About Us</title>
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Roboto', sans-serif; background:#f5f5f5; color:#1C1C1C; overflow-x:hidden; }
-
-/* Hero Section */
-.hero {
-    background: url('aboutus.png') center/cover no-repeat;
-    height:60vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; color:white; position:relative;
+/* =====================
+   THEME VARIABLES
+===================== */
+:root {
+    --accent: #db483d;
+    --bg: #1f1d1d;
+    --text: #ffffff;
+    --card-bg: #2a2828;
+    --nav-bg: #860000;
+    --join-btn: #CF0000;
+    --hero-img: url('aboutus.png'); /* 🌑 Dark mode pic */
 }
-.hero::after { content:""; position:absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:0; }
-.hero-content { position:relative; z-index:1; animation: fadeIn 2s ease-in; }
-.hero h1 { font-family:'Montserrat', sans-serif; font-size:3em; margin-bottom:20px; }
-.hero p { font-size:1.2em; max-width:700px; margin:auto; }
 
-/* Sidebar */
-#sidebar { position: fixed; left:-250px; top:0; width:250px; height:100%; background:#E4002B; color:white; transition:left 0.3s; padding:20px; z-index:999; }
-#sidebar.open { left:0; }
-#sidebar a { display:block; margin:15px 0; color:white; text-decoration:none; font-weight:bold; }
-#sidebar-toggle { position:fixed; left:20px; top:20px; font-size:30px; cursor:pointer; z-index:1001; }
+[data-theme="light"] {
+    --bg: #dedede;
+    --text: #000000;
+    --card-bg: #ffffff;
+    --hero-img: url('lightmodepic.png'); /* 🌞 Light mode pic */
+}
 
-/* Sections */
-section { padding:80px 20px; text-align:center; opacity:0; transform:translateY(30px); transition: all 1s ease-in-out; }
-section.visible { opacity:1; transform:translateY(0); }
-section h2 { font-family:'Montserrat', sans-serif; font-size:2.5em; margin-bottom:40px; color:#E4002B; }
-.pagesections { background-color: rgb(221, 221, 221); margin-left:20px; margin-right:20px; border:3px solid #E4002B; border-radius:15px; }
+/* =====================
+   GLOBAL & ANIMATION
+===================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* Footer */
-footer { background:#1C1C1C; color:white; padding:40px 20px; text-align:center; }
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.4s ease, color 0.4s ease;
+    overflow-x: hidden;
+}
 
-/* Animations */
-@keyframes fadeIn { 0% { opacity:0; transform:translateY(30px);} 100% { opacity:1; transform:translateY(0); } }
+/* ✨ THE REVEAL MAGIC ✨ */
+.reveal {
+    opacity: 0;
+    transform: scale(0.9) translateY(60px);
+    transition: all 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    visibility: hidden;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    visibility: visible;
+}
+
+section { padding: 80px 20px; text-align: center; }
+h1, h2, h3, h4, p, span, a { color: inherit; }
+
+/* =====================
+   LOADING SCREEN
+===================== */
+#loading-screen {
+    position: fixed; inset: 0; background: #1f1d1d; z-index: 10000;
+    display: flex; justify-content: center; align-items: center;
+    transition: opacity 0.6s ease, visibility 0.6s;
+}
+.loader-container { position: relative; width: 200px; height: 200px; display: flex; justify-content: center; align-items: center; }
+.loader-logo { width: 120px; z-index: 2; }
+.orbit { position: absolute; width: 180px; height: 180px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.1); animation: rotate 2s linear infinite; }
+.loading-plane { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(90deg); font-size: 1.5rem; }
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+#loading-screen.fade-out { opacity: 0; visibility: hidden; }
+
+/* =====================
+   NAVBAR (MATCHES HOME)
+===================== */
+.navbar-wrapper { position: fixed; top: 20px; width: 100%; display: flex; justify-content: center; z-index: 999; transition: all 0.4s ease; }
+.navbar { background: var(--nav-bg); padding: 12px 28px; border-radius: 999px; display: flex; align-items: center; gap: 40px; box-shadow: 0 12px 35px rgba(0,0,0,0.45); transition: all 0.3s ease; }
+.navbar:hover { transform: scale(1.03); }
+.navbar.scrolled { background: rgba(134, 0, 0, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
+.navbar img { width: 130px; }
+.navbar a { color: white; text-decoration: none; font-weight: 600; transition: opacity 0.3s; }
+
+/* Dropdown */
+.dropdown { position: relative; display: inline-block; }
+.dropdown-content { display: none; position: absolute; background-color: var(--nav-bg); min-width: 220px; border-radius: 15px; margin-top: 10px; overflow: hidden; text-align: left; }
+.dropdown-content a { color: white; padding: 12px 16px; display: block; font-size: 14px; }
+.dropdown-content a:hover { background-color: rgba(255,255,255,0.1); }
+.dropdown:hover .dropdown-content { display: block; }
+
+.join-btn { background: var(--join-btn); padding: 8px 18px; border-radius: 999px; font-weight: bold; color: white !important; }
+.theme-btn { cursor: pointer; font-size: 18px; }
+
+/* =====================
+   HERO SECTION
+===================== */
+.hero {
+    height: 70vh;
+    background: var(--hero-img) center/cover no-repeat;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.5s ease;
+}
+.hero::after { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.55); }
+.hero-content { position: relative; z-index: 1; text-align: center; color: white; }
+.hero h1 { font-size: 3.5em; margin-bottom: 10px; }
+
+/* =====================
+   CONTENT CARDS
+===================== */
+.about-container { max-width: 1000px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+.info-card { background: var(--card-bg); padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease; text-align: left; }
+.info-card:hover { transform: translateY(-10px); }
+.info-card h2 { color: var(--accent); margin-bottom: 15px; }
+
+footer { background: #111; padding: 40px; color: white; text-align: center; }
 </style>
 </head>
-<body>
 
-<!-- Sidebar -->
-<div id="sidebar">
-    <a href="index.html">Home</a>
-    <a href="#about-us">About Us</a>
-    <a href="applications.html">Applications</a>
-    <a href="flights.html">Flights</a>
-    <a href="#footer">Contact</a>
+<body data-theme="dark">
+
+<div id="loading-screen">
+    <div class="loader-container">
+        <img src="logo1.png" class="loader-logo">
+        <div class="orbit"><div class="loading-plane">✈️</div></div>
+    </div>
 </div>
-<div id="sidebar-toggle">&#9776;</div>
 
-<!-- Hero Section -->
+<div class="navbar-wrapper">
+    <div class="navbar">
+        <img src="logo1.png">
+        <a href="index.html">Home</a>
+        <a href="aboutus.html">About</a>
+        <a href="flights.html">Flights</a>
+        <div class="dropdown">
+            <a href="applications.html" class="dropbtn">Apply ▾</a>
+            <div class="dropdown-content">
+                <a href="#">Pilot Application</a>
+                <a href="#">Flight & Ground Crew</a>
+                <a href="#">ATC Application</a>
+            </div>
+        </div>
+        <a href="https://discord.gg/rNBzZ6w2" class="join-btn">Join Now</a>
+        <div class="theme-btn" id="themeToggle">🌙</div>
+    </div>
+</div>
+
 <section class="hero">
     <div class="hero-content">
-        <h1>About Qantas PTFS</h1>
-        <p>Discover our mission, vision, and the passionate community behind Qantas PTFS, your premier virtual airline experience.</p>
+        <h1>Our Story</h1>
+        <p>Bringing the heart of Australia to the virtual skies.</p>
     </div>
 </section>
 
-<!-- About Us Section -->
-<section class="pagesections" id="about-us">
-    <h2>Our Story</h2>
-    <p>Qantas PTFS was founded to provide pilots and crew with an immersive, professional, and fun flying experience. We focus on realistic operations, engaging community events, and creating a welcoming environment for all skill levels. Our team is passionate about aviation and aims to bring the heart of Australia to the skies of PTFS.</p>
-    <br>
-    <h2>Mission</h2>
-    <p>To deliver the most engaging, realistic, and community-driven virtual airline experience, inspiring pilots and crew to grow together and enjoy every flight.</p>
-    <br>
-    <h2>Vision</h2>
-    <p>To become the leading virtual airline in PTFS, known for our professionalism, community, and memorable flying adventures.</p>
-    <br>
-    <h2>Community</h2>
-    <p>Our community is the backbone of Qantas PTFS. We encourage collaboration, skill-building, and friendship through group flights, events, and a friendly Discord server.</p>
+<section class="reveal">
+    <div class="about-container">
+        <div class="info-card">
+            <h2>Our Roots</h2>
+            <p>Qantas PTFS was founded to provide pilots and crew with an immersive, professional, and fun flying experience. We focus on realistic operations and engaging community events.</p>
+        </div>
+        <div class="info-card">
+            <h2>The Mission</h2>
+            <p>To deliver the most engaging, realistic, and community-driven virtual airline experience, inspiring pilots and crew to grow together and enjoy every flight.</p>
+        </div>
+        <div class="info-card">
+            <h2>The Vision</h2>
+            <p>To become the leading virtual airline in PTFS, known for our professionalism, community, and memorable flying adventures.</p>
+        </div>
+        <div class="info-card">
+            <h2>Our Community</h2>
+            <p>The backbone of Qantas PTFS. We encourage collaboration and friendship through group flights, events, and a friendly Discord server.</p>
+        </div>
+    </div>
 </section>
 
-<!-- Footer -->
-<footer id="footer">
-    <p>&copy; 2025 Qantas PTFS. All rights reserved.</p>
-</footer>
+<footer>&copy; 2025 Qantas PTFS. All rights reserved.</footer>
 
 <script>
-// Sidebar Toggle
-const sidebar = document.getElementById('sidebar');
-const toggle = document.getElementById('sidebar-toggle');
-toggle.addEventListener('click', () => { sidebar.classList.toggle('open'); });
+/* THEME TOGGLE */
+const themeToggle = document.getElementById("themeToggle");
+themeToggle.onclick = () => {
+    const dark = document.body.dataset.theme === "dark";
+    document.body.dataset.theme = dark ? "light" : "dark";
+    themeToggle.textContent = dark ? "🌞" : "🌙";
+};
 
-// Scroll Fade-in Animation
-const sections = document.querySelectorAll('section');
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => { if(entry.isIntersecting){ entry.target.classList.add('visible'); } });
-}, { threshold: 0.2 });
-sections.forEach(section => observer.observe(section));
+/* LOADING SCREEN HIDE */
+window.addEventListener('load', () => {
+    const loader = document.getElementById('loading-screen');
+    setTimeout(() => { loader.classList.add('fade-out'); }, 1500); 
+});
+
+/* NAVBAR SCROLL */
+window.onscroll = () => {
+    const nav = document.querySelector(".navbar");
+    if (window.scrollY > 50) nav.classList.add("scrolled");
+    else nav.classList.remove("scrolled");
+};
+
+/* SCROLL REVEAL ENGINE */
+const observerOptions = { threshold: 0.15 };
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add("active");
+        else entry.target.classList.remove("active");
+    });
+}, observerOptions);
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
+
 </body>
 </html>
