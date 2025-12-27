@@ -3,346 +3,428 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Qantas PTFS - Fly the Australian Skies</title>
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
+<title>Qantas PTFS</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
-/* === General Styles === */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Roboto', sans-serif; background: #f5f5f5; color: #1C1C1C; overflow-x: hidden; }
-
-/* === Loading Screen === */
-#loading-screen {
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    background: #ffffff; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:1000;
-}
-#loading-screen img { width:500px; margin-bottom:10px; }
-.dots span {
-    display:inline-block; width:10px; height:10px; margin:0 5px; background:#E4002B; border-radius:50%;
-    animation: bounce 1s infinite;
-}
-.dots span:nth-child(2){ animation-delay:0.2s; }
-.dots span:nth-child(3){ animation-delay:0.4s; }
-@keyframes bounce {
-    0%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-15px); }
+/* =====================
+   THEME VARIABLES
+===================== */
+:root {
+    --accent: #db483d;
+    --bg: #1f1d1d;
+    --text: #ffffff;
+    --card-bg: #2a2828;
+    --nav-bg: #860000;
+    --join-btn: #CF0000;
+    --hero-img: url("lightmodepic.png");
 }
 
-/* === Sidebar === */
-#sidebar {
-    position: fixed; left:-250px; top:0; width:250px; height:100%; background:#E4002B; color:white;
-    transition: left 0.3s; padding:20px; z-index:999;
-}
-#sidebar.open { left:0; }
-#sidebar a { display:block; margin:15px 0; color:white; text-decoration:none; font-weight:bold; }
-#sidebar-toggle { position:fixed; left:20px; top:20px; font-size:30px; cursor:pointer; z-index:1001; }
-
-/* === Hero Section === */
-.hero {
-    background: url('banner.png') center/cover no-repeat;
-    height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; color:white; position:relative; overflow:hidden;
-}
-.hero::after { content:""; position:absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:0; }
-.hero-content { position:relative; z-index:1; animation: fadeIn 2s ease-in; }
-.hero h1 { font-family: 'Montserrat', sans-serif; font-size:3em; margin-bottom:20px; }
-.hero p { font-size:1.2em; max-width:600px; margin:auto; margin-bottom:30px; }
-.btn { padding:15px 30px; margin:10px; background:#ff0000; color:#f8f8f8; font-weight:bold; border-radius:8px; transition: transform 0.3s; }
-.btn:hover { transform: scale(1.05); }
-
-/* === Sections === */
-section { padding:80px 20px; text-align:center; opacity:0; transform: translateY(30px); transition: all 1s ease-in-out; }
-section.visible { opacity:1; transform:translateY(0); }
-
-section h2 { font-family: 'Montserrat', sans-serif; font-size:2.5em; margin-bottom:40px; color:#E4002B; }
-.card-container { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; }
-.card { background:white; border-radius:15px; box-shadow:0 8px 20px rgba(0,0,0,0.2); overflow:hidden; width:250px; transition: transform 0.3s; }
-.card:hover { transform: translateY(-10px); }
-.card img { width:100%; }
-.card-content { padding:20px; }
-.card-content h3 { margin-bottom:10px; color:#E4002B; }
-
-/* Footer */
-footer { background:#1C1C1C; color:white; padding:40px 20px; text-align:center; }
-
-/* Animations */
-@keyframes fadeIn { 0% { opacity:0; transform:translateY(30px);} 100% { opacity:1; transform:translateY(0); } }
-.pagesections {
-    background-color: rgb(221, 221, 221);
-    margin-left: 20px;
-    margin-right: 20px;
-    border: 3px solid #E4002B;
-    border-radius: 15px;
+[data-theme="light"] {
+    --bg: #dedede;
+    --text: #000000;
+    --card-bg: #ffffff;
+    --hero-img: url("lightmodepic.png");
 }
 
-/* === Flight Ticket Section === */
-.flight-ticket {
-    max-width: 900px;
-    margin: auto;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-    overflow: hidden;
-    border-left: 8px solid #E4002B;
+/* =====================
+   GLOBAL & ANIMATION
+===================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.ticket-header {
-    background: #E4002B;
-    color: white;
-    padding: 20px;
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.4s ease, color 0.4s ease;
+    overflow-x: hidden;
+}
+
+/* ✨ THE REVEAL MAGIC ✨ */
+.reveal {
+    opacity: 0;
+    transform: scale(0.9) translateY(60px);
+    transition: all 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    visibility: hidden;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    visibility: visible;
+}
+
+section {
+    padding: 80px 20px;
     text-align: center;
 }
 
-.ticket-header h3 {
-    font-size: 2em;
-    letter-spacing: 2px;
+h1, h2, h3, h4, p, span, a {
+    color: inherit;
 }
 
-.ticket-body {
-    padding: 30px;
-}
-
-.route {
+/* =====================
+   NAVBAR & DROPDOWN
+===================== */
+.navbar-wrapper {
+    position: fixed;
+    top: 20px;
+    width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    z-index: 999;
+    transition: all 0.4s ease;
+}
+
+.navbar {
+    background: var(--nav-bg);
+    padding: 12px 28px;
+    border-radius: 999px;
+    display: flex;
     align-items: center;
-    text-align: center;
-    margin-bottom: 25px;
+    gap: 40px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.45);
+    transition: all 0.3s ease;
 }
 
-.airport h4 {
-    color: #E4002B;
-    font-size: 1.4em;
+.navbar:hover { transform: scale(1.03); }
+
+.navbar.scrolled {
+    background: rgba(134, 0, 0, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.airport p {
-    font-size: 0.9em;
-    opacity: 0.8;
-}
+.navbar img { width: 130px; }
 
-.plane {
-    font-size: 2.5em;
-    color: #E4002B;
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-}
-
-.info-box {
-    background: #f2f2f2;
-    padding: 15px;
-    border-radius: 12px;
-    font-size: 0.95em;
-}
-
-.info-box span {
-    display: block;
-    font-weight: bold;
-    color: #E4002B;
-    margin-bottom: 5px;
-}
-
-.status {
-    margin-top: 20px;
-    padding: 15px;
-    background: #eaffea;
-    border-left: 5px solid #28a745;
-    border-radius: 10px;
-    font-weight: bold;
-}
-
-.ticket-footer {
-    text-align: center;
-    padding: 20px;
-}
-
-.ticket-footer a {
-    display: inline-block;
-    background: #E4002B;
+.navbar a {
     color: white;
-    padding: 12px 25px;
-    border-radius: 8px;
     text-decoration: none;
-    font-weight: bold;
-    transition: transform 0.3s;
+    font-weight: 600;
+    transition: opacity 0.3s;
 }
 
-.ticket-footer a:hover {
-    transform: scale(1.05);
+/* Dropdown */
+.dropdown { position: relative; display: inline-block; }
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--nav-bg);
+    min-width: 220px;
+    border-radius: 15px;
+    margin-top: 10px;
+    overflow: hidden;
+    text-align: left;
+}
+.dropdown-content a { color: white; padding: 12px 16px; display: block; font-size: 14px; }
+.dropdown-content a:hover { background-color: rgba(255,255,255,0.1); }
+.dropdown:hover .dropdown-content { display: block; }
+
+.join-btn { background: var(--join-btn); padding: 8px 18px; border-radius: 999px; font-weight: bold; color: white !important; }
+.theme-btn { cursor: pointer; font-size: 18px; }
+
+/* =====================
+   HERO
+===================== */
+.hero {
+    height: 100vh;
+    /* 🔒 Fix: Use the variable here */
+    background: var(--hero-img) center/cover no-repeat; 
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.5s ease; /* Smooth fade between images */
 }
 
+.hero::after { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.55); }
+.hero-content { position: relative; z-index: 1; text-align: center; }
+.hero-logo { width: 250px; margin-bottom: 25px; }
+.hero h1 { font-size: 4em; margin-bottom: -20px; color: white; }
+.hero p { color: white; }
+
+/* Conveyor */
+.word-track { height: 80px; overflow: hidden; margin-bottom: 20px; }
+.word-inner { display: flex; flex-direction: column; align-items: center; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1); }
+.word { height: 80px; line-height: 80px; font-size: 1.8em; opacity: 0.4; transform: scale(0.8); transition: all 0.6s ease; color: var(--accent); }
+.word.active { font-size: 3.5em; opacity: 1; transform: scale(1); }
+
+/* =====================
+   LOADING SCREEN
+===================== */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    background: #1f1d1d; /* Matches your dark theme bg */
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.6s ease, visibility 0.6s;
+}
+
+.loader-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader-logo {
+    width: 120px;
+    z-index: 2;
+}
+
+.orbit {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,0.1);
+    animation: rotate 2s linear infinite;
+}
+
+.loading-plane {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%) rotate(90deg);
+    font-size: 1.5rem;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Class to hide loader */
+#loading-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* =====================
+   SECTIONS
+===================== */
+.about-section { padding: 100px 8%; background: var(--bg); }
+.about-card { display: flex; border-radius: 25px; overflow: hidden; background: var(--card-bg); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+.about-text { width: 45%; padding: 60px; text-align: left; }
+.about-image { width: 55%; filter: brightness(70%); }
+.about-image img { width: 100%; height: 100%; object-fit: cover; }
+.about-btn { display: inline-block; padding: 12px 25px; border-radius: 30px; background: var(--accent); color: white !important; text-decoration: none; font-weight: 600; margin-top: 20px; }
+
+/* Ticket */
+.flight-ticket { max-width: 800px; margin: 40px auto; background: var(--card-bg); border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.2); text-align: left; }
+.ticket-header { background: var(--nav-bg); padding: 20px; color: white; display: flex; justify-content: space-between; }
+.ticket-body { padding: 30px; position: relative; }
+.route { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--accent); padding-bottom: 20px; margin-bottom: 20px; }
+.airport h4 { font-size: 2.5em; color: var(--accent); }
+.info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+.info-box span { display: block; color: var(--accent); font-size: 12px; font-weight: bold; }
+.ticket-footer { background: rgba(0,0,0,0.1); padding: 15px; text-align: center; }
+.ticket-body::before, .ticket-body::after { content: ""; position: absolute; width: 30px; height: 30px; background: var(--bg); border-radius: 50%; top: 50%; transform: translateY(-50%); transition: 0.4s; }
+.ticket-body::before { left: -15px; }
+.ticket-body::after { right: -15px; }
+
+/* Team */
+.team-container { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-top: 50px; }
+.team-card { background: var(--card-bg); width: 280px; padding: 40px 20px; border-radius: 30px; position: relative; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); }
+.team-card:hover { transform: translateY(-15px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-color: var(--accent); }
+.pfp-wrapper { width: 130px; height: 130px; margin: 0 auto 20px; position: relative; }
+.pfp-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 4px solid var(--accent); padding: 5px; }
+.status-dot { position: absolute; bottom: 10px; right: 10px; width: 18px; height: 18px; background: #4caf50; border: 3px solid var(--card-bg); border-radius: 50%; }
+.role-badge { display: inline-block; padding: 5px 15px; background: rgba(219,72,61,0.15); color: var(--accent); border-radius: 20px; font-size: 0.8em; font-weight: 700; text-transform: uppercase; margin-top: 10px; }
+
+footer { background: #111; padding: 40px; color: white; text-align: center; }
 </style>
 </head>
-<body>
 
-<!-- Loading Screen -->
-<div id="loading-screen">
-    <img src="logo2.png" alt="Qantas PTFS Logo">
-    <div class="dots"><span></span><span></span><span></span></div>
+<body data-theme="dark">
+
+    <div id="loading-screen">
+    <div class="loader-container">
+        <img src="logo1.png" class="loader-logo">
+        <div class="orbit">
+            <div class="loading-plane">✈️</div>
+        </div>
+    </div>
 </div>
 
-<!-- Sidebar Navigation -->
-<div id="sidebar">
-    <a href="#hero">Home</a>
-    <a href="#about">About Us</a>
-    <a href="#team">Team</a>
-    <a href="#apply">Applications</a>
-    <a href="#footer">Contact</a>
+<div class="navbar-wrapper">
+    <div class="navbar">
+        <img src="logo1.png">
+        <a href="#hero">Home</a>
+        <a href="aboutus.html">About</a>
+        <a href="flights.html">Flights</a>
+        <div class="dropdown">
+            <a href="applications.html" class="dropbtn">Apply ▾</a>
+            <div class="dropdown-content">
+                <a href="applications.html">Pilot Application</a>
+                <a href="applications.html">Flight & Ground Crew</a>
+                <a href="applications.html">ATC Application</a>
+            </div>
+        </div>
+        <a href="https://discord.gg/rNBzZ6w2" class="join-btn">Join Now</a>
+        <div class="theme-btn" id="themeToggle">🌙</div>
+    </div>
 </div>
-<div id="sidebar-toggle">&#9776;</div>
 
-<!-- Hero Section -->
 <section class="hero" id="hero">
     <div class="hero-content">
-        <h1>Welcome to Qantas PTFS 🇦🇺</h1>
-        <p>Fly with Australia’s premier virtual airline! Join a passionate community, participate in group flights, and bring the spirit of Qantas to the skies of PTFS.</p>
-        <a href="https://discord.gg/rNBzZ6w2" class="btn">Join Discord</a>
-        <a href="#apply" class="btn">Apply Now</a>
+        <img src="logo1.png" class="hero-logo">
+        <h1>Welcome to</h1>
+        <div class="word-track">
+            <div class="word-inner" id="wordInner"></div>
+        </div>
+        <p>Making the spirit of Australia immerse in the sky</p>
     </div>
 </section>
-<hr style="border:1px dashed #E4002B; width: 100%; margin:40px auto;">
 
-<!-- About Us Teaser -->
-<section class="pagesections" id="about">
-    <h2>About Us</h2>
-    <p>Qantas PTFS is a growing virtual airline dedicated to providing pilots and crew with a professional, fun, and immersive flying experience. We focus on realistic operations, engaging events, and a welcoming community for all skill levels...</p>
-    <br>
-    <a href="aboutus.html" class="btn">About Us!</a>
-</section>
-<hr style="border:1px dashed #E4002B; width: 100%; margin:40px auto;">
-<hr style="border:1px dashed #E4002B; width:100%; margin:40px auto;">
-
-<section class="pagesections" id="flights">
-    <h2>✈️ Next Flight</h2>
-    <a href="flights.html" class="btn">Flights page</a>
-    <br><br>
-    <div class="flight-ticket">
-
-        <div class="ticket-header">
-            <h3>QF 2026</h3>
-            <p> Flight Information</p>
-            
-        </div>
-
-        <div class="ticket-body">
-
-            <div class="route">
-                <div class="airport">
-                    <h4>SYD</h4>
-                    <p>Sydney (perth)</p>
-                    <p>Departure: 06:25 UTC</p>
-                </div>
-
-                <div class="plane">✈️</div>
-
-                <div class="airport">
-                    <h4>MLB</h4>
-                    <p>Melbourne (GR)</p>
-                    <p>Arrival: 07:00 UTC</p>
-                </div>
-            </div>
-
-            <div class="info-grid">
-                <div class="info-box">
-                    <span>Date</span>
-                    Thu, 25 Dec 2025
-                </div>
-
-                <div class="info-box">
-                    <span>Aircraft</span>
-                    Aircraft name
-                </div>
-
-                <div class="info-box">
-                    <span>Terminal</span>
-                    Terminal 1
-                </div>
-
-                <div class="info-box">
-                    <span>Gate</span>
-                    Gate 5
-                </div>
-
-                <div class="info-box">
-                    <span>Meal Service</span>
-                    Yes
-                </div>
-
-                <div class="info-box">
-                    <span>Host</span>
-                    Norn
-                </div>
-            </div>
-
-            <div class="status">
-                Status: On‑Time ✅ | Alerts: None
-            </div>
-
-        </div>
-
-        <div class="ticket-footer">
-            <a href="#">Server Link: Flight Not Started</a>
-        </div>
-
+<section class="about-section reveal" id="about">
+  <div class="about-card">
+    <div class="about-text">
+      <h2>About Us</h2>
+      <p>Qantas PTFS is a growing virtual airline dedicated to providing pilots and crew with a professional, fun, and immersive flying experience.</p>
+      <a href="#" class="about-btn">See more</a>
     </div>
+    <div class="about-image">
+      <img src="aboutus1.png">
+    </div>
+  </div>
 </section>
-<hr style="border:1px dashed #E4002B; width: 100%; margin:40px auto;">
-<!-- Team Section -->
-<section class="pagesections" id="team">
-    <h2>Our Founders</h2>
-    <div class="card-container">
-        <div class="card">
-            <img src="lilbro.png" alt="Owner">
-            <div class="card-content">
-                <h3>Owner: Norn</h3>
+
+<section id="flights" class="reveal">
+  <h2 style="font-size: 2.5em; margin-bottom: 20px;">✈️ Next Flight</h2>
+  <div class="flight-ticket">
+    <div class="ticket-header">
+      <h3>QF 001</h3>
+      <p>BOARDING PASS</p>
+    </div>
+    <div class="ticket-body">
+      <div class="route">
+        <div class="airport"><h4>SYD</h4><p>Sydney</p></div>
+        <div style="font-size: 2em; opacity: 0.3;">✈️</div>
+        <div class="airport" style="text-align: right;"><h4>MLB</h4><p>Melbourne</p></div>
+      </div>
+      <div class="info-grid">
+        <div class="info-box"><span>Date</span>25 Dec 2025</div>
+        <div class="info-box"><span>Aircraft</span>Boeing 787</div>
+        <div class="info-box"><span>Gate</span>Gate 5</div>
+        <div class="info-box"><span>Host</span>Norn</div>
+        <div class="info-box"><span>Status</span>On-Time ✅</div>
+      </div>
+    </div>
+    <div class="ticket-footer">
+      <a href="#">Join Server: Flight Not Started</a>
+    </div>
+  </div>
+</section>
+
+<section id="team" class="reveal">
+    <h2 style="font-size: 2.5em; margin-bottom: 10px;">The Crew</h2>
+    <p style="opacity: 0.6; margin-bottom: 40px;">The minds behind the spirit of Australia</p>
+    <div class="team-container">
+        <div class="team-card">
+            <div class="pfp-wrapper">
+                <img src="lilbro.png" alt="Norn">
+                <div class="status-dot"></div>
             </div>
+            <h3>Norn</h3>
+            <div class="role-badge">Owner</div>
+             <p style="color: #616060 ;">The founder and mastermind behind the spirit of Australia</p>
         </div>
-        <div class="card">
-            <img src="Helixo.jpg" alt="Co-Owner">
-            <div class="card-content">
-                <h3>Co-Owner: Helixo</h3>
+        <div class="team-card">
+            <div class="pfp-wrapper">
+                <img src="Helixo.jpg" alt="Helixo">
+                <div class="status-dot"></div>
             </div>
+            <h3>Helixo</h3>
+            <br>
+                        <p style="color: #616060 ;">The developer, cofounder and mastermind behind the spirit of Australia</p>
+                        <br>
+            <p style="color: #616060 ;">Created this website btw :D</p>
+            <div class="role-badge">Co-Owner</div>
         </div>
     </div>
 </section>
-<hr style="border:1px dashed #E4002B; width: 100%; margin:40px auto;">
 
-<!-- Application Section -->
-<section class="pagesections" id="apply">
-    <h2>Applications</h2>
-    <p>Applying to be a pilot or part of the crew? Go to the applications page to apply!</p>
-    <br>
-    <br>
-    <a href="applications.html" class="btn">Go to Applications</a>
-</section>
+<footer>&copy; 2025 Qantas PTFS, This server is not associated, authorized , affiliated or endorsed by the real Qantas Airline in any way.
 
-<!-- Footer -->
-<footer id="footer">
-    <p>&copy; 2025 Qantas PTFS. All rights reserved.</p>
-    <p>This server is not associated, authorized , affiliated or endorsed by the real Qantas Airline in any way.</p>
-    <p>All rights and trademarks belong to Qantas.</p>
-    <a href='www.qantas.com'>The official website</a>
-</footer>
+All rights and trademarks belong to Qantas.</footer>
 
 <script>
-// Loading Screen
-window.addEventListener('load', () => {
-    setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 2000);
+/* THEME TOGGLE */
+const themeToggle = document.getElementById("themeToggle");
+themeToggle.onclick = () => {
+    const dark = document.body.dataset.theme === "dark";
+    document.body.dataset.theme = dark ? "light" : "dark";
+    themeToggle.textContent = dark ? "🌞" : "🌙";
+};
+
+/* CONVEYOR */
+const words = ["Excellence","Luxury","Australia’s Spirit","First Class","Refinement"];
+const inner = document.getElementById("wordInner");
+let i = 0;
+words.forEach(w=>{
+    const s=document.createElement("span");
+    s.className="word"; s.textContent=w; inner.appendChild(s);
 });
+inner.appendChild(inner.children[0].cloneNode(true));
+inner.children[0].classList.add("active");
+setInterval(()=>{
+    i++;
+    inner.style.transform=`translateY(-${i*80}px)`;
+    [...inner.children].forEach(c=>c.classList.remove("active"));
+    if(inner.children[i]) inner.children[i].classList.add("active");
+    if(i===words.length){
+        setTimeout(()=>{
+            inner.style.transition="none";
+            inner.style.transform="translateY(0)";
+            i=0;
+            inner.children[0].classList.add("active");
+            setTimeout(()=>inner.style.transition="",50);
+        },850);
+    }
+},3000);
 
-// Sidebar Toggle
-const sidebar = document.getElementById('sidebar');
-const toggle = document.getElementById('sidebar-toggle');
-toggle.addEventListener('click', () => { sidebar.classList.toggle('open'); });
+/* NAVBAR SCROLL */
+window.onscroll = () => {
+    const nav = document.querySelector(".navbar");
+    if (window.scrollY > 50) nav.classList.add("scrolled");
+    else nav.classList.remove("scrolled");
+};
 
-// Scroll Fade-in Animation
-const sections = document.querySelectorAll('section');
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => { if(entry.isIntersecting){ entry.target.classList.add('visible'); } });
-}, { threshold: 0.2 });
-sections.forEach(section => observer.observe(section));
+/* ✨ SCROLL REVEAL ENGINE ✨ */
+const observerOptions = { threshold: 0.15 };
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+        } else {
+            entry.target.classList.remove("active"); 
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* HIDE LOADING SCREEN */
+window.addEventListener('load', () => {
+    const loader = document.getElementById('loading-screen');
+    // Small timeout so it doesn't just flash and disappear too fast
+    setTimeout(() => {
+        loader.classList.add('fade-out');
+    }, 1500); 
+});
 </script>
+
 </body>
 </html>
