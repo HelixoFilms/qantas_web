@@ -203,13 +203,14 @@ footer { background: #111; padding: 40px; color: white; text-align: center; }
         <div class="airport" style="text-align: right;"><h4>CYP</h4><p>Cyprus</p></div>
       </div>
       <div class="info-grid">
-        <div class="info-box"><span>Date</span>27 Dec 2025</div>
+        <div class="info-box"><span>Date</span>29 Dec 2025</div>
         <div class="info-box"><span>Aircraft</span>Boeing 787</div>
         <div class="info-box"><span>Gate</span>Gate 10</div>
         <div class="info-box"><span>Host</span>Norn and Helixo</div>
          <div class="info-box"><span>Meal</span>Standard</div>
         <div class="info-box"><span>Status</span>On-Time ✅</div>
       <div class="info-box"><span>Terminal</span>T1</div>
+          <div class="info-box"><span>In your timezone</span> <p style="color: var(--text);">[t:1766930400:R]</p> </div>
       </div>
     </div>
   </div>
@@ -247,15 +248,66 @@ footer { background: #111; padding: 40px; color: white; text-align: center; }
 
 <script>
 /* THEME TOGGLE */
-const themeToggle = document.getElementById("themeToggle");
-themeToggle.onclick = () => {
-    const dark = document.body.dataset.theme === "dark";
-    document.body.dataset.theme = dark ? "light" : "dark";
-    themeToggle.textContent = dark ? "🌞" : "🌙";
+const setupTheme = () => {
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle.onclick = () => {
+        const dark = document.body.dataset.theme === "dark";
+        document.body.dataset.theme = dark ? "light" : "dark";
+        themeToggle.textContent = dark ? "🌞" : "🌙";
+    };
+};
+
+/* TIMESTAMP TRANSLATOR */
+const translateTimestamps = () => {
+    // We use brackets [t:timestamp:style] in HTML to avoid browser tag confusion
+    // But we check for both <t: and [t: just in case
+    const regex = /[<\[]t:(\d+):([a-zA-Z])[>\]]/g;
+    
+    // Target only the ticket info boxes to be safe and efficient
+    const content = document.querySelectorAll('.info-box p, .info-box');
+    
+    content.forEach(el => {
+        if (el.children.length === 0 || el.tagName === 'P') {
+            el.innerHTML = el.innerHTML.replace(regex, (match, unix, style) => {
+                const date = new Date(parseInt(unix) * 1000);
+                
+                switch (style) {
+                    case 't': return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    case 'T': return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    case 'd': return date.toLocaleDateString();
+                    case 'D': return date.toLocaleDateString([], { day: 'numeric', month: 'long', year: 'numeric' });
+                    case 'f': return date.toLocaleString([], { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    case 'R': 
+                        const formatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+                        const diffInSeconds = Math.floor((date - new Date()) / 1000);
+                        
+                        if (Math.abs(diffInSeconds) < 60) return "just now";
+                        
+                        const minutes = Math.floor(diffInSeconds / 60);
+                        if (Math.abs(minutes) < 60) return formatter.format(minutes, 'minute');
+                        
+                        const hours = Math.floor(minutes / 60);
+                        if (Math.abs(hours) < 24) return formatter.format(hours, 'hour');
+                        
+                        const days = Math.floor(hours / 24);
+                        if (Math.abs(days) < 30) return formatter.format(days, 'day');
+                        
+                        const months = Math.floor(days / 30);
+                        if (Math.abs(months) < 12) return formatter.format(months, 'month');
+                        
+                        return formatter.format(Math.floor(days / 365), 'year');
+                    default: return date.toLocaleString();
+                }
+            });
+        }
+    });
 };
 
 /* LOADING SCREEN */
 window.addEventListener('load', () => {
+    translateTimestamps(); 
+    setupTheme();
+    
     const loader = document.getElementById('loading-screen');
     setTimeout(() => { loader.classList.add('fade-out'); }, 1500); 
 });
